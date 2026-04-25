@@ -97,7 +97,10 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(cors());
+  app.use(cors({
+  origin: "https://class-link-7ck5.vercel.app", // your frontend URL
+  credentials: true
+}));
   app.use(express.json());
   app.use(cookieParser());
   app.set("trust proxy", 1);
