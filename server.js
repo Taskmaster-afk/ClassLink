@@ -180,6 +180,9 @@ async function startServer() {
   app.post("/api/auth/register", async (req, res) => {
     const { name, email, password, role } = req.body;
     try {
+      if (!name || !email || !password || !role) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
       const hashedPassword = await bcrypt.hash(password, 10);
       const info = db.prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)").run(name, email, hashedPassword, role);
       const user = db.prepare("SELECT id, name, email, role FROM users WHERE id = ?").get(info.lastInsertRowid);
@@ -199,29 +202,35 @@ async function startServer() {
 
   app.post("/api/auth/login", async (req, res) => {
     const { email, password } = req.body;
-    const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
-    if (user && await bcrypt.compare(password, user.password)) {
-      const { password: _, ...userSafe } = user;
-      const token = jwt.sign(userSafe, JWT_SECRET);
-      res.cookie("token", token, { 
-        httpOnly: true, 
-        sameSite: 'none',
-        secure: true,
-        path: '/',
-        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
-      }).json(userSafe);
-    } else {
-      res.status(401).json({ error: "Invalid credentials" });
+    try {
+      const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+      if (user && await bcrypt.compare(password, user.password)) {
+        const { password: _, ...userSafe } = user;
+        const token = jwt.sign(userSafe, JWT_SECRET);
+        res.cookie("token", token, { 
+          httpOnly: true, 
+          sameSite: 'none',
+          secure: true,
+          path: '/',
+          maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        }).json(userSafe);
+      } else {
+        res.status(401).json({ error: "Invalid credentials" });
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      res.status(500).json({ error: "Internal server error" });
     }
   });
 
   app.get("/api/auth/me", (req, res) => {
-    const token = req.cookies.token;
+    const token = req.cookies?.token;
     if (!token) return res.json(null);
     try {
       const decoded = jwt.verify(token, JWT_SECRET);
       res.json(decoded);
     } catch (err) {
+      console.error("Token verification failed:", err.message);
       res.json(null);
     }
   });
@@ -396,9 +405,14 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
+  if (process.env.NODE_ENV !== "test" && process.env.VERCEL !== "1") {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  }
+
+  return app;
 }
 
-startServer();
+const appPromise = startServer();
+export default appPromise;
