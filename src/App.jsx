@@ -35,7 +35,7 @@ export default function App() {
   const [view, setView] = useState({ type: 'dashboard' });
 
   useEffect(() => {
-    fetch('/api/auth/me', { credentials: 'include' })
+    fetch("https://classlink-kwee.onrender.com/api/auth/me", { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (data && !data.error) {
