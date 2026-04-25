@@ -1,3 +1,4 @@
+const BASE_URL = "https://classlink-kwee.onrender.com";
 import { useEffect, useState } from 'react';
 import { 
   Book, 
@@ -127,7 +128,9 @@ function AuthPage({ onLogin }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+    const endpoint = isLogin 
+  ? `${BASE_URL}/api/auth/login` 
+  : `${BASE_URL}/api/auth/register`;
     try {
       const res = await fetch(endpoint, {
         method: 'POST',
@@ -273,7 +276,7 @@ function Dashboard({ user, setView }) {
   const [modalError, setModalError] = useState(null);
 
   const fetchClasses = () => {
-    fetch('/api/classes', { credentials: 'include' })
+    fetch(`${BASE_URL}/api/classes`, { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setClasses(data);
@@ -284,7 +287,7 @@ function Dashboard({ user, setView }) {
 
   const fetchTodo = () => {
     if (user.role === 'student') {
-      fetch('/api/student/assignments', { credentials: 'include' })
+      fetch(`${BASE_URL}/api/student/assignments`, { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
           if (Array.isArray(data)) setTodoList(data);
@@ -302,7 +305,7 @@ function Dashboard({ user, setView }) {
     e.preventDefault();
     setModalError(null);
     try {
-      const res = await fetch('/api/classes/join', {
+      const res = await fetch(`${BASE_URL}/api/classes/join`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ invite_code: inviteCode }),
@@ -325,7 +328,7 @@ function Dashboard({ user, setView }) {
     e.preventDefault();
     setModalError(null);
     try {
-      const res = await fetch('/api/classes', {
+      const res = await fetch(`${BASE_URL}/api/classes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newClass),
@@ -530,7 +533,7 @@ function ClassroomView({ user, classId, setView }) {
   const [resourceFile, setResourceFile] = useState(null);
 
   const fetchClass = () => {
-    fetch(`/api/classes/${classId}`, { credentials: 'include' })
+    fetch(`${BASE_URL}/api/classes/${classId}`, { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (data && !data.error) setClassroom(data);
@@ -540,7 +543,7 @@ function ClassroomView({ user, classId, setView }) {
   };
 
   const fetchResources = () => {
-    fetch(`/api/classes/${classId}/resources`, { credentials: 'include' })
+    fetch(`${BASE_URL}/api/classes/${classId}/resources`, { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setResources(data);
@@ -557,7 +560,7 @@ function ClassroomView({ user, classId, setView }) {
     e.preventDefault();
     if (!newAnnouncement.trim()) return;
     try {
-      const res = await fetch(`/api/classes/${classId}/announcements`, {
+      const res = await fetch(`${BASE_URL}/api/classes/${classId}/announcements`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: newAnnouncement }),
@@ -584,7 +587,7 @@ function ClassroomView({ user, classId, setView }) {
     formData.append('points', assignmentForm.points);
     if (assignmentFile) formData.append('file', assignmentFile);
 
-    const res = await fetch(`/api/classes/${classId}/assignments`, {
+    const res = await fetch(`${BASE_URL}/api/classes/${classId}/assignments`, {
       method: 'POST',
       body: formData,
       credentials: 'include'
@@ -606,7 +609,7 @@ function ClassroomView({ user, classId, setView }) {
     formData.append('description', resourceForm.description);
     formData.append('file', resourceFile);
 
-    const res = await fetch(`/api/classes/${classId}/resources`, {
+    const res = await fetch(`${BASE_URL}/api/classes/${classId}/resources`, {
       method: 'POST',
       body: formData,
       credentials: 'include'
@@ -909,7 +912,7 @@ function AssignmentView({ user, assignmentId, setView }) {
   const [grading, setGrading] = useState(null);
 
   const fetchAssignment = () => {
-    fetch(`/api/assignments/${assignmentId}`, { credentials: 'include' })
+    fetch(`${BASE_URL}/api/assignments/${assignmentId}`, { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (data && !data.error) {
@@ -930,7 +933,7 @@ function AssignmentView({ user, assignmentId, setView }) {
     formData.append('content', submissionContent);
     if (submissionFile) formData.append('file', submissionFile);
 
-    const res = await fetch(`/api/assignments/${assignmentId}/submit`, {
+    const res = await fetch(`${BASE_URL}/api/assignments/${assignmentId}/submit`, {
       method: 'POST',
       body: formData,
       credentials: 'include'
@@ -944,7 +947,7 @@ function AssignmentView({ user, assignmentId, setView }) {
   const handleGrade = async (e) => {
     e.preventDefault();
     if (!grading) return;
-    const res = await fetch(`/api/submissions/${grading.id}/grade`, {
+    const res = await fetch(`${BASE_URL}/api/submissions/${grading.id}/grade`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ grade: grading.grade, feedback: grading.feedback }),
