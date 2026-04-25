@@ -95,7 +95,7 @@ try {
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.PORT || 3000;
 
   app.use(cors({
   origin: "https://class-link-7ck5.vercel.app", // your frontend URL
@@ -242,7 +242,12 @@ async function startServer() {
   });
 
   app.post("/api/auth/logout", (req, res) => {
-    res.clearCookie("token").json({ success: true });
+    res.clearCookie("token", {
+  httpOnly: true,
+  sameSite: "none",
+  secure: true,
+  path: "/"
+}).json({ success: true });
   });
 
   // Student To-Do List
@@ -395,7 +400,9 @@ async function startServer() {
     db.prepare("UPDATE submissions SET grade = ?, feedback = ?, status = 'graded' WHERE id = ?").run(grade, feedback, req.params.id);
     res.json({ success: true });
   });
-
+app.get("/", (req, res) => {
+  res.send("Server is running");
+});
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
