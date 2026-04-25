@@ -56,7 +56,7 @@ export default function App() {
   }, []);
 
   const logout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    await fetch('https://classlink-kwee.onrender.com/api/auth/logout', { method: 'POST', credentials: 'include' });
     setUser(null);
     setView({ type: 'dashboard' });
   };
