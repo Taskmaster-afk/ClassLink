@@ -150,9 +150,14 @@ function AuthPage({ onLogin }) {
     <div className="min-h-screen grid lg:grid-cols-2 bg-white">
       <div className="hidden lg:flex bg-emerald-900 p-12 flex-col justify-between text-white overflow-hidden relative">
         <div className="relative z-10">
-          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-emerald-900 mb-8 shadow-lg">
-            <Book size={28} />
-          </div>
+        <div className="flex items-center gap-3 mb-8">
+  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-emerald-900 shadow-lg">
+    <Book size={28} />
+  </div>
+  <span className="text-2xl font-bold text-white">
+    ClassLink
+  </span>
+</div>
           <h1 className="text-5xl font-bold tracking-tight leading-tight mb-4">
             A natural space for <br /> modern learning.
           </h1>
