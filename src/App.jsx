@@ -625,7 +625,7 @@ const postAssignment = async (e) => {
   }
 
   // ✅ SUCCESS
-  setShowAssignmentModal(false);
+  setShowAssignModal(false);
 
   setAssignmentForm({
     title: "",
