@@ -588,7 +588,12 @@ function ClassroomView({ user, classId, setView }) {
     const formData = new FormData();
     formData.append('title', assignmentForm.title);
     formData.append('description', assignmentForm.description);
-    formData.append('due_date', assignmentForm.due_date);
+    formData.append(
+  'due_date',
+  assignmentForm.due_date
+    ? new Date(assignmentForm.due_date).toISOString()
+    : null
+);
     formData.append('points', assignmentForm.points);
     if (assignmentFile) formData.append('file', assignmentFile);
 
@@ -597,6 +602,8 @@ function ClassroomView({ user, classId, setView }) {
       body: formData,
       credentials: 'include'
     });
+    const data = await res.json();
+    console.log("ASSIGNMENT RESPONSE:", data);
     if (res.ok) {
       setShowAssignModal(false);
       setAssignmentForm({ title: '', description: '', due_date: '', points: 100 });
@@ -842,7 +849,7 @@ function ClassroomView({ user, classId, setView }) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="label">Due Date</label>
-                  <input type="datetime-local" className="input w-full" value={assignmentForm.due_date} onChange={e => setAssignmentForm({ ...assignmentForm, due_date: e.target.value })} />
+                  <input type="datetime-local" className="input w-full" value={assignmentForm.due_date} onChange={e => setAssignmentForm({ ...assignmentForm, due_date: e.target.value || "" })} />
                 </div>
                 <div>
                   <label className="label">Points</label>
@@ -990,7 +997,7 @@ function AssignmentView({ user, assignmentId, setView }) {
             <div className="border-t border-stone-100 pt-6">
               <p className="text-stone-600 leading-relaxed whitespace-pre-wrap mb-6">{assignment.description || 'No instructions provided.'}</p>
               
-              {assignment.file_path && (
+              {assignment.file_path && assignment.file_path !== "null" && (
                 <div className="bg-stone-50 p-4 rounded-2xl flex items-center justify-between border border-stone-100">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-emerald-700 shadow-sm">
@@ -1002,7 +1009,9 @@ function AssignmentView({ user, assignmentId, setView }) {
                     </div>
                   </div>
                   <a 
-                    href={`${BASE_URL}${assignment.file_path}`} 
+                   href={assignment.file_path.startsWith("http")
+  ? assignment.file_path
+  : `${BASE_URL}${assignment.file_path}`} 
                     target="_blank" 
                     rel="noreferrer"
                     className="p-2 hover:bg-white rounded-xl transition-colors text-emerald-700"
