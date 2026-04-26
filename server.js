@@ -21,14 +21,20 @@ const JWT_SECRET = process.env.JWT_SECRET || "default_secret_dev";
 
 // Initialize Database Connection
 const dbConfig = {
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database: process.env.DB_NAME || "classlink",
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+
   multipleStatements: true,
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+
+  ssl: {
+    rejectUnauthorized: false
+  }
 };
 
 let pool;
