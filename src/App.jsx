@@ -36,7 +36,7 @@ export default function App() {
   const [view, setView] = useState({ type: 'dashboard' });
 
   useEffect(() => {
-    fetch("${BASE_URL}/api/auth/me", {
+    fetch(`${BASE_URL}/api/auth/me`, {
   credentials: "include"
 })
       .then(res => res.json())
@@ -740,7 +740,7 @@ function ClassroomView({ user, classId, setView }) {
                       <div className="flex justify-between items-start mb-2">
                         <span className="font-bold text-stone-800 text-sm">{a.author_name}</span>
                         <span className="text-[10px] uppercase tracking-wider text-stone-400 font-bold">
-                          {new Date(a.created_at).toLocaleDateString()}
+                          {a.created_at ? new Date(a.created_at).toLocaleDateString() : "No date"}
                         </span>
                       </div>
                       <p className="text-sm text-stone-900 leading-relaxed whitespace-pre-wrap">{a.content}</p>
@@ -809,7 +809,7 @@ function ClassroomView({ user, classId, setView }) {
                         </div>
                       </div>
                       <a 
-                        href={r.file_path} 
+                        href={`${BASE_URL}${r.file_path}`}
                         target="_blank" 
                         rel="noreferrer"
                         className="p-2 hover:bg-stone-50 rounded-xl transition-colors text-emerald-700"
@@ -1002,7 +1002,7 @@ function AssignmentView({ user, assignmentId, setView }) {
                     </div>
                   </div>
                   <a 
-                    href={assignment.file_path} 
+                    href={`${BASE_URL}${assignment.file_path}`} 
                     target="_blank" 
                     rel="noreferrer"
                     className="p-2 hover:bg-white rounded-xl transition-colors text-emerald-700"
@@ -1043,7 +1043,7 @@ function AssignmentView({ user, assignmentId, setView }) {
                     {s.file_path && (
                       <div className="mt-3">
                         <a 
-                          href={s.file_path} 
+                          href={`${BASE_URL}${s.file_path}`} 
                           target="_blank" 
                           rel="noreferrer"
                           className="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 hover:underline"
@@ -1115,7 +1115,7 @@ function AssignmentView({ user, assignmentId, setView }) {
                 {assignment.mySubmission?.file_path && !submissionFile && (
                   <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-between">
                     <span className="text-[10px] font-bold text-emerald-700 truncate max-w-[150px]">Current: {assignment.mySubmission.file_path.split('/').pop()}</span>
-                    <a href={assignment.mySubmission.file_path} target="_blank" rel="noreferrer" className="text-emerald-700"><Download size={14} /></a>
+                    <a href={`${BASE_URL}${assignment.mySubmission.file_path}`} target="_blank" rel="noreferrer" className="text-emerald-700"><Download size={14} /></a>
                   </div>
                 )}
 
