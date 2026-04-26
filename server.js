@@ -542,7 +542,15 @@ const safeAssignments = assignments.map(a => ({
   // Global error handler for middleware (like Multer/Cloudinary)
   app.use((err, req, res, next) => {
     console.error("Global Error Handler:", err);
-    res.status(500).json({ error: err.message || "An unexpected error occurred" });
+    
+    let errorMsg = "An unexpected error occurred";
+    if (err.message) errorMsg = err.message;
+    else if (typeof err === 'string') errorMsg = err;
+    else {
+      try { errorMsg = JSON.stringify(err); } catch(e) {}
+    }
+
+    res.status(500).json({ error: errorMsg, rawError: err });
   });
 
   return app;
