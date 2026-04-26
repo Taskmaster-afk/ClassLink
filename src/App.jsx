@@ -583,34 +583,60 @@ function ClassroomView({ user, classId, setView }) {
     }
   };
 
-  const postAssignment = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append('title', assignmentForm.title);
-    formData.append('description', assignmentForm.description);
-    formData.append(
-  'due_date',
-  assignmentForm.due_date
-    ? new Date(assignmentForm.due_date).toISOString()
-    : null
-);
-    formData.append('points', assignmentForm.points);
-    if (assignmentFile) formData.append('file', assignmentFile);
+const postAssignment = async (e) => {
+  e.preventDefault();
 
-    const res = await fetch(`${BASE_URL}/api/classes/${classId}/assignments`, {
-      method: 'POST',
-      body: formData,
-      credentials: 'include'
-    });
-    const data = await res.json();
-    console.log("ASSIGNMENT RESPONSE:", data);
-    if (res.ok) {
-      setShowAssignModal(false);
-      setAssignmentForm({ title: '', description: '', due_date: '', points: 100 });
-      setAssignmentFile(null);
-      fetchClass();
-    }
-  };
+  const formData = new FormData();
+
+  formData.append("title", assignmentForm.title);
+  formData.append("description", assignmentForm.description);
+
+  formData.append(
+    "due_date",
+    assignmentForm.due_date
+      ? new Date(assignmentForm.due_date).toISOString()
+      : ""
+  );
+
+  formData.append("points", assignmentForm.points);
+
+  if (assignmentFile) {
+    formData.append("file", assignmentFile);
+  }
+
+  const res = await fetch(`${BASE_URL}/api/classes/${classId}/assignments`, {
+    method: "POST",
+    body: formData,
+    credentials: "include"
+  });
+
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    data = { error: "Invalid server response" };
+  }
+
+  console.log("ASSIGNMENT RESPONSE:", data);
+
+  if (!res.ok) {
+    alert(data.error || "Failed to post assignment");
+    return;
+  }
+
+  // ✅ SUCCESS
+  setShowAssignmentModal(false);
+
+  setAssignmentForm({
+    title: "",
+    description: "",
+    due_date: "",
+    points: 100
+  });
+  setAssignmentFile(null);
+
+  fetchClass();
+};
 
   const uploadResource = async (e) => {
     e.preventDefault();
