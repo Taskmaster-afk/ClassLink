@@ -1,4 +1,4 @@
-const BASE_URL = "https://classlink-kwee.onrender.com";
+const BASE_URL = "https://classlink-production-1313.up.railway.app";
 import { useEffect, useState } from 'react';
 import { 
   Book, 
@@ -36,7 +36,7 @@ export default function App() {
   const [view, setView] = useState({ type: 'dashboard' });
 
   useEffect(() => {
-    fetch("https://classlink-kwee.onrender.com/api/auth/me", {
+    fetch("${BASE_URL}/api/auth/me", {
   credentials: "include"
 })
       .then(res => res.json())
@@ -57,7 +57,7 @@ export default function App() {
   }, []);
 
   const logout = async () => {
-    await fetch('https://classlink-kwee.onrender.com/api/auth/logout', { method: 'POST', credentials: 'include' });
+    await fetch('${BASE_URL}/api/auth/logout', { method: 'POST', credentials: 'include' });
     setUser(null);
     setView({ type: 'dashboard' });
   };
