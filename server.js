@@ -385,7 +385,7 @@ async function startServer() {
       
       const [teacherRows] = await pool.execute("SELECT name FROM users WHERE id = ?", [classroom.teacher_id]);
       const teacher = teacherRows[0];
-      classroom.teacher_name = teacher?.name;
+      classroom.teacher_name = teacher?.name || "Unknown";
 
       const [announcements] = await pool.execute(`
         SELECT a.*, u.name as author_name 
@@ -395,11 +395,15 @@ async function startServer() {
         ORDER BY created_at DESC
       `, [req.params.id]);
 const [assignments] = await pool.execute(
-  "SELECT *, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') as created_at FROM assignments WHERE class_id = ? ORDER BY created_at DESC",
+  "SELECT * FROM assignments WHERE class_id = ? ORDER BY id DESC",
   [req.params.id]
 );
 
-      res.json({ ...classroom, announcements, assignments });
+const safeAssignments = assignments.map(a => ({
+  ...a,
+  created_at: a.created_at ? new Date(a.created_at) : new Date()
+}));
+      res.json({ ...classroom, announcements, assignments: safeAssignments });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Internal server error" });
@@ -434,11 +438,11 @@ const [assignments] = await pool.execute(
         "INSERT INTO assignments (class_id, title, description, due_date, points, file_path, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())",
         [req.params.id, title, description, formattedDueDate, points || 100, file_path]
 );
-      res.json({
+   res.json({
   id: result.insertId,
   title,
   description,
-  due_date,
+  due_date: formattedDueDate,
   created_at: new Date(),
   points: points || 100,
   file_path
