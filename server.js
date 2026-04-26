@@ -12,8 +12,7 @@ import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import multer from "multer";
 import fs from "fs";
-import { v2 as cloudinary } from "cloudinary";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
+
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -160,25 +159,22 @@ async function startServer() {
   app.set("trust proxy", 1);
 
   // Configure Multer
+  const uploadDir = path.join(__dirname, "uploads");
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+  }
 
-
-// configure cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-// storage setup
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: "classlink_uploads",
-    resource_type: "auto",
-  },
-});
-
-const upload = multer({ storage });
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      const safeName = file.originalname.replace(/\s+/g, "_");
+      cb(null, uniqueSuffix + "-" + safeName);
+    }
+  });
+  const upload = multer({ storage: storage });
 
   // Serve uploads statically
   app.use("/uploads", express.static(uploadDir));
