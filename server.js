@@ -1,3 +1,4 @@
+console.log("ENV DB_HOST:", process.env.DB_HOST);
 import express from "express";
 import cors from "cors";
 
