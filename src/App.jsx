@@ -842,7 +842,7 @@ const postAssignment = async (e) => {
                         </div>
                       </div>
                       <a 
-                        href={`${BASE_URL}${r.file_path}`}
+                        href={r.file_path.startsWith("http") ? r.file_path : `${BASE_URL}${r.file_path}`}
                         target="_blank" 
                         rel="noreferrer"
                         className="p-2 hover:bg-stone-50 rounded-xl transition-colors text-emerald-700"
@@ -1078,7 +1078,7 @@ function AssignmentView({ user, assignmentId, setView }) {
                     {s.file_path && (
                       <div className="mt-3">
                         <a 
-                          href={`${BASE_URL}${s.file_path}`} 
+                          href={s.file_path.startsWith("http") ? s.file_path : `${BASE_URL}${s.file_path}`} 
                           target="_blank" 
                           rel="noreferrer"
                           className="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 hover:underline"
@@ -1150,7 +1150,7 @@ function AssignmentView({ user, assignmentId, setView }) {
                 {assignment.mySubmission?.file_path && !submissionFile && (
                   <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-between">
                     <span className="text-[10px] font-bold text-emerald-700 truncate max-w-[150px]">Current: {assignment.mySubmission.file_path.split('/').pop()}</span>
-                    <a href={`${BASE_URL}${assignment.mySubmission.file_path}`} target="_blank" rel="noreferrer" className="text-emerald-700"><Download size={14} /></a>
+                    <a href={assignment.mySubmission.file_path.startsWith("http") ? assignment.mySubmission.file_path : `${BASE_URL}${assignment.mySubmission.file_path}`} target="_blank" rel="noreferrer" className="text-emerald-700"><Download size={14} /></a>
                   </div>
                 )}
 
