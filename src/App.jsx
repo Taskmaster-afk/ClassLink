@@ -771,7 +771,7 @@ function ClassroomView({ user, classId, setView }) {
                   </div>
                   <div className="flex-1">
                     <h4 className="font-bold text-stone-800">{a.title}</h4>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Posted {new Date(a.created_at).toLocaleDateString()} • {a.points} points</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Posted { a.created_at ? new Date(a.created_at).toLocaleDateString() : "No date"} • {a.points} points</p>
                   </div>
                   <ChevronRight size={20} className="text-stone-200 group-hover:text-emerald-700" />
                 </div>

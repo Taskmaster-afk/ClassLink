@@ -18,7 +18,10 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const JWT_SECRET = process.env.JWT_SECRET || "default_secret_dev";
+if (!process.env.JWT_SECRET) {
+  throw new Error("JWT_SECRET not set");
+}
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Initialize Database Connection
 const dbConfig = {
@@ -88,6 +91,7 @@ async function initDB() {
       due_date DATETIME,
       points INT DEFAULT 100,
       file_path TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE
     );
 
@@ -166,7 +170,8 @@ async function startServer() {
     },
     filename: (req, file, cb) => {
       const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      cb(null, uniqueSuffix + "-" + file.originalname);
+      const safeName = file.originalname.replace(/\s+/g, "_");
+      cb(null, uniqueSuffix + "-" + safeName);
     }
   });
   const upload = multer({ storage: storage });
@@ -389,8 +394,10 @@ async function startServer() {
         WHERE a.class_id = ? 
         ORDER BY created_at DESC
       `, [req.params.id]);
-
-      const [assignments] = await pool.execute("SELECT * FROM assignments WHERE class_id = ?", [req.params.id]);
+const [assignments] = await pool.execute(
+  "SELECT *, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') as created_at FROM assignments WHERE class_id = ? ORDER BY created_at DESC",
+  [req.params.id]
+);
 
       res.json({ ...classroom, announcements, assignments });
     } catch (err) {
@@ -416,10 +423,26 @@ async function startServer() {
     try {
       if (req.user.role !== "teacher") return res.status(403).json({ error: "Only teachers can create assignments" });
       const { title, description, due_date, points } = req.body;
+
+      // convert safely
+      const formattedDueDate = due_date
+        ? new Date(due_date)
+        : null;
       const file_path = req.file ? `/uploads/${req.file.filename}` : null;
       
-      const [result] = await pool.execute("INSERT INTO assignments (class_id, title, description, due_date, points, file_path) VALUES (?, ?, ?, ?, ?, ?)", [req.params.id, title, description, due_date, points || 100, file_path]);
-      res.json({ id: result.insertId, title, description, due_date, points: points || 100, file_path });
+      const [result] = await pool.execute(
+        "INSERT INTO assignments (class_id, title, description, due_date, points, file_path, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())",
+        [req.params.id, title, description, formattedDueDate, points || 100, file_path]
+);
+      res.json({
+  id: result.insertId,
+  title,
+  description,
+  due_date,
+  created_at: new Date(),
+  points: points || 100,
+  file_path
+});
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Internal server error" });
