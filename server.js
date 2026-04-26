@@ -1,6 +1,8 @@
 console.log("ENV DB_HOST:", process.env.DB_HOST);
 import express from "express";
 import cors from "cors";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 
 import { createServer as createViteServer } from "vite";
 import path from "path";
@@ -159,25 +161,23 @@ async function startServer() {
   app.set("trust proxy", 1);
 
   // Configure Multer
-  const uploadDir = path.join(__dirname, "uploads");
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
-  }
-
-  const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      const safeName = file.originalname.replace(/\s+/g, "_");
-      cb(null, uniqueSuffix + "-" + safeName);
-    }
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
   });
-  const upload = multer({ storage: storage });
 
-  // Serve uploads statically
-  app.use("/uploads", express.static(uploadDir));
+  const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: "classlink_uploads",
+      resource_type: "auto",
+    },
+  });
+
+  const upload = multer({ storage });
+
+  // Note: Uploads are served directly from Cloudinary
 
   // Auth Middleware
   const authenticate = (req, res, next) => {
@@ -205,7 +205,7 @@ async function startServer() {
       if (ownerRows.length === 0) return res.status(403).json({ error: "You don't own this class" });
 
       const { title, description } = req.body;
-      const file_path = req.file ? `/uploads/${req.file.filename}` : null;
+      const file_path = req.file ? req.file.path : null;
       
       if (!file_path) return res.status(400).json({ error: "File is required for resources" });
 
@@ -432,7 +432,7 @@ const safeAssignments = assignments.map(a => ({
       const formattedDueDate = due_date
         ? new Date(due_date)
         : null;
-      const file_path = req.file ? `/uploads/${req.file.filename}` : null;
+      const file_path = req.file ? req.file.path : null;
       
       const [result] = await pool.execute(
         "INSERT INTO assignments (class_id, title, description, due_date, points, file_path, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())",
@@ -485,7 +485,7 @@ const safeAssignments = assignments.map(a => ({
     try {
       if (req.user.role !== "student") return res.status(403).json({ error: "Only students can submit" });
       const { content } = req.body;
-      const file_path = req.file ? `/uploads/${req.file.filename}` : null;
+      const file_path = req.file ? req.file.path : null;
       
       const [existingRows] = await pool.execute("SELECT id FROM submissions WHERE assignment_id = ? AND student_id = ?", [req.params.id, req.user.id]);
       const existing = existingRows[0];
