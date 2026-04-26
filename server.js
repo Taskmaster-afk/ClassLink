@@ -133,7 +133,19 @@ async function initDB() {
   `;
   
   await pool.query(schema);
-  console.log("Database initialized");
+  
+  // Auto-migrate schema: add created_at to assignments if missing
+  try {
+    await pool.execute("ALTER TABLE assignments ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP");
+    console.log("Migration: added created_at to assignments");
+  } catch (err) {
+    // Ignore if column already exists (ER_DUP_FIELDNAME)
+    if (err.code !== 'ER_DUP_FIELDNAME') {
+      console.error("Migration error (assignments):", err);
+    }
+  }
+
+  console.log("Database initialized and migrated");
 }
 
 async function startServer() {
@@ -213,7 +225,7 @@ async function startServer() {
       res.json({ id: result.insertId, title, description, file_path });
     } catch (err) {
       console.error(err);
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ error: err.message || "Internal server error" });
     }
   });
 
@@ -229,7 +241,7 @@ async function startServer() {
       res.json(resources);
     } catch (err) {
       console.error(err);
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ error: err.message || "Internal server error" });
     }
   });
 
@@ -406,7 +418,7 @@ const safeAssignments = assignments.map(a => ({
       res.json({ ...classroom, announcements, assignments: safeAssignments });
     } catch (err) {
       console.error(err);
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ error: err.message || "Internal server error" });
     }
   });
 
@@ -418,7 +430,7 @@ const safeAssignments = assignments.map(a => ({
       res.json({ id: result.insertId, content, created_at: new Date().toISOString() });
     } catch (err) {
       console.error(err);
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ error: err.message || "Internal server error" });
     }
   });
 
@@ -449,7 +461,7 @@ const safeAssignments = assignments.map(a => ({
 });
     } catch (err) {
       console.error(err);
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ error: err.message || "Internal server error" });
     }
   });
 
@@ -477,7 +489,7 @@ const safeAssignments = assignments.map(a => ({
       res.json({ ...assignment, submissions, mySubmission });
     } catch (err) {
       console.error(err);
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ error: err.message || "Internal server error" });
     }
   });
 
@@ -510,7 +522,7 @@ const safeAssignments = assignments.map(a => ({
       res.json({ success: true });
     } catch (err) {
       console.error(err);
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ error: err.message || "Internal server error" });
     }
   });
 
