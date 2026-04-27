@@ -2,7 +2,7 @@ import { Book, LogOut, Calendar as CalendarIcon, LayoutDashboard } from 'lucide-
 
 export default function Sidebar({ user, view, setView, classes, logout }) {
   return (
-    <div className="w-64 bg-white border-r border-stone-200 flex flex-col min-h-screen sticky top-0">
+    <div className="w-80 bg-white border-r border-stone-200 flex flex-col min-h-screen sticky top-0 flex-shrink-0">
       <div className="p-6 border-b border-stone-100">
         <div 
           className="flex items-center gap-3 cursor-pointer group" 
