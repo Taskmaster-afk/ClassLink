@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Book, GraduationCap, Plus, ChevronRight, ClipboardCheck } from 'lucide-react';
 import { motion } from 'motion/react';
 import { BASE_URL } from '../lib/utils.js';
-
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 export default function Dashboard({ user, setView }) {
   const [classes, setClasses] = useState([]);
   const [todoList, setTodoList] = useState([]);
@@ -11,6 +12,15 @@ export default function Dashboard({ user, setView }) {
   const [inviteCode, setInviteCode] = useState('');
   const [newClass, setNewClass] = useState({ name: '', description: '' });
   const [modalError, setModalError] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const filteredTodoList = todoList.filter(a => {
+    if (!a.due_date) return false;
+    const dueDate = new Date(a.due_date);
+    return dueDate.getFullYear() === selectedDate.getFullYear() &&
+           dueDate.getMonth() === selectedDate.getMonth() &&
+           dueDate.getDate() === selectedDate.getDate();
+  });
 
   const fetchClasses = () => {
     fetch(`${BASE_URL}/api/classes`, { credentials: 'include' })
@@ -154,10 +164,20 @@ export default function Dashboard({ user, setView }) {
 
             {user.role === 'student' ? (
               <div className="space-y-4">
-                {todoList.length === 0 ? (
-                  <p className="text-xs text-stone-400 italic">No pending assignments! Nice work.</p>
+                <div className="mb-6 rounded-2xl overflow-hidden border border-stone-100 shadow-sm calendar-container">
+                  <Calendar 
+                    onChange={setSelectedDate} 
+                    value={selectedDate} 
+                    className="w-full border-none font-sans text-sm"
+                  />
+                </div>
+                <h4 className="text-xs font-bold text-stone-800 uppercase tracking-widest mb-3">
+                  Due on {selectedDate.toLocaleDateString()}
+                </h4>
+                {filteredTodoList.length === 0 ? (
+                  <p className="text-xs text-stone-400 italic">No assignments due on this date.</p>
                 ) : (
-                  todoList.map(a => (
+                  filteredTodoList.map(a => (
                     <div 
                       key={a.id} 
                       onClick={() => setView({ type: 'assignment', id: a.id })}

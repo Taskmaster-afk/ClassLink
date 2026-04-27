@@ -43,3 +43,54 @@
 .label {
   @apply text-xs font-bold uppercase tracking-wider text-stone-400 mb-1 block;
 }
+
+/* Custom react-calendar styling */
+.react-calendar {
+  width: 100% !important;
+  background: white;
+  border: none !important;
+  font-family: inherit !important;
+  line-height: 1.125em;
+}
+.react-calendar__navigation button {
+  min-width: 44px;
+  background: none;
+  font-weight: bold;
+  color: var(--color-stone-800);
+}
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+  background-color: var(--color-stone-50) !important;
+  border-radius: 8px;
+}
+.react-calendar__month-view__weekdays {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.75rem;
+  color: var(--color-stone-400);
+  text-decoration: none !important;
+}
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none !important;
+}
+.react-calendar__tile {
+  padding: 0.75em 0.5em !important;
+  border-radius: 8px;
+  font-weight: 500;
+  color: var(--color-stone-600);
+}
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background-color: var(--color-stone-50) !important;
+  color: var(--color-emerald-700);
+}
+.react-calendar__tile--now {
+  background: var(--color-stone-100) !important;
+  color: var(--color-stone-800) !important;
+  font-weight: bold;
+}
+.react-calendar__tile--active {
+  background: var(--color-emerald-700) !important;
+  color: white !important;
+  font-weight: bold;
+}
