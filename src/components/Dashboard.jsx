@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { Book, GraduationCap, Plus, ChevronRight, ClipboardCheck } from 'lucide-react';
 import { motion } from 'motion/react';
 import { BASE_URL } from '../lib/utils.js';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
+
 export default function Dashboard({ user, setView }) {
   const [classes, setClasses] = useState([]);
   const [todoList, setTodoList] = useState([]);
@@ -12,15 +11,6 @@ export default function Dashboard({ user, setView }) {
   const [inviteCode, setInviteCode] = useState('');
   const [newClass, setNewClass] = useState({ name: '', description: '' });
   const [modalError, setModalError] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
-  const filteredTodoList = todoList.filter(a => {
-    if (!a.due_date) return false;
-    const dueDate = new Date(a.due_date);
-    return dueDate.getFullYear() === selectedDate.getFullYear() &&
-           dueDate.getMonth() === selectedDate.getMonth() &&
-           dueDate.getDate() === selectedDate.getDate();
-  });
 
   const fetchClasses = () => {
     fetch(`${BASE_URL}/api/classes`, { credentials: 'include' })
@@ -95,7 +85,7 @@ export default function Dashboard({ user, setView }) {
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-8"
@@ -122,16 +112,16 @@ export default function Dashboard({ user, setView }) {
               </div>
               <h3 className="text-lg font-bold text-stone-800 mb-1">No classes yet</h3>
               <p className="text-stone-500 mb-6 max-w-xs mx-auto text-xs">
-                {user.role === 'teacher' 
-                  ? "Start by creating your first class to invite students." 
+                {user.role === 'teacher'
+                  ? "Start by creating your first class to invite students."
                   : "Ask your teacher for a class code to get started."}
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {classes.map(c => (
-                <motion.div 
-                  key={c.id} 
+                <motion.div
+                  key={c.id}
                   whileHover={{ y: -4 }}
                   onClick={() => setView({ type: 'class', id: c.id })}
                   className="card p-5 cursor-pointer hover:border-emerald-700/30 group bg-white shadow-sm"
@@ -145,7 +135,7 @@ export default function Dashboard({ user, setView }) {
                   <p className="text-stone-500 text-xs line-clamp-1 mb-4">{c.description}</p>
                   <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-stone-400">
                     <span className="flex items-center gap-1.5 truncate pr-2">
-                       {user.role === 'student' ? (c.teacher_name || 'Instructor') : 'You'}
+                      {user.role === 'student' ? (c.teacher_name || 'Instructor') : 'You'}
                     </span>
                     <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform flex-shrink-0" />
                   </div>
@@ -158,28 +148,18 @@ export default function Dashboard({ user, setView }) {
         <div className="md:col-span-1">
           <div className="card p-6 bg-white shadow-sm sticky top-24">
             <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-stone-400 mb-6 flex items-center gap-2">
-              <ClipboardCheck size={18} className="text-emerald-700" /> 
+              <ClipboardCheck size={18} className="text-emerald-700" />
               {user.role === 'student' ? 'Your To-Do List' : 'Class Overview'}
             </h3>
 
             {user.role === 'student' ? (
               <div className="space-y-4">
-                <div className="mb-6 rounded-2xl overflow-hidden border border-stone-100 shadow-sm calendar-container">
-                  <Calendar 
-                    onChange={setSelectedDate} 
-                    value={selectedDate} 
-                    className="w-full border-none font-sans text-sm"
-                  />
-                </div>
-                <h4 className="text-xs font-bold text-stone-800 uppercase tracking-widest mb-3">
-                  Due on {selectedDate.toLocaleDateString()}
-                </h4>
-                {filteredTodoList.length === 0 ? (
-                  <p className="text-xs text-stone-400 italic">No assignments due on this date.</p>
+                {todoList.length === 0 ? (
+                  <p className="text-xs text-stone-400 italic">No pending assignments! Nice work.</p>
                 ) : (
-                  filteredTodoList.map(a => (
-                    <div 
-                      key={a.id} 
+                  todoList.map(a => (
+                    <div
+                      key={a.id}
                       onClick={() => setView({ type: 'assignment', id: a.id })}
                       className="group cursor-pointer border-b border-stone-50 pb-3 last:border-0 hover:bg-stone-50 transition-colors p-2 rounded-lg -mx-2"
                     >
@@ -218,10 +198,10 @@ export default function Dashboard({ user, setView }) {
             <form onSubmit={handleJoin} className="space-y-4">
               <div>
                 <label className="label">Invite Code</label>
-                <input 
+                <input
                   required
-                  type="text" 
-                  className="input w-full uppercase" 
+                  type="text"
+                  className="input w-full uppercase"
                   placeholder="X7Y2Z3"
                   value={inviteCode}
                   onChange={e => setInviteCode(e.target.value)}
@@ -246,10 +226,10 @@ export default function Dashboard({ user, setView }) {
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
                 <label className="label">Class Name</label>
-                <input 
+                <input
                   required
-                  type="text" 
-                  className="input w-full" 
+                  type="text"
+                  className="input w-full"
                   placeholder="Advanced Mathematics"
                   value={newClass.name}
                   onChange={e => setNewClass({ ...newClass, name: e.target.value })}
@@ -257,8 +237,8 @@ export default function Dashboard({ user, setView }) {
               </div>
               <div>
                 <label className="label">Description (Optional)</label>
-                <textarea 
-                  className="input w-full h-32 resize-none" 
+                <textarea
+                  className="input w-full h-32 resize-none"
                   placeholder="Topics, goals, and syllabus overview..."
                   value={newClass.description}
                   onChange={e => setNewClass({ ...newClass, description: e.target.value })}
