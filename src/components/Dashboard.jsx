@@ -1,17 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Book, GraduationCap, Plus, ChevronRight, ClipboardCheck } from 'lucide-react';
+import { Book, GraduationCap, ChevronRight, ClipboardCheck } from 'lucide-react';
 import { motion } from 'motion/react';
 import { BASE_URL } from '../lib/utils.js';
 
 export default function Dashboard({ user, setView, classes, fetchClasses }) {
   const [todoList, setTodoList] = useState([]);
-  const [showJoinModal, setShowJoinModal] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [inviteCode, setInviteCode] = useState('');
-  const [newClass, setNewClass] = useState({ name: '', description: '' });
-  const [modalError, setModalError] = useState(null);
-
-
 
   const fetchTodo = () => {
     if (user.role === 'student') {
@@ -28,52 +21,6 @@ export default function Dashboard({ user, setView, classes, fetchClasses }) {
     fetchTodo();
   }, []);
 
-  const handleJoin = async (e) => {
-    e.preventDefault();
-    setModalError(null);
-    try {
-      const res = await fetch(`${BASE_URL}/api/classes/join`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ invite_code: inviteCode }),
-        credentials: 'include'
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setShowJoinModal(false);
-        setInviteCode('');
-        fetchClasses();
-      } else {
-        setModalError(data.error);
-      }
-    } catch (err) {
-      setModalError("Failed to join class.");
-    }
-  };
-
-  const handleCreate = async (e) => {
-    e.preventDefault();
-    setModalError(null);
-    try {
-      const res = await fetch(`${BASE_URL}/api/classes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newClass),
-        credentials: 'include'
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setShowCreateModal(false);
-        setNewClass({ name: '', description: '' });
-        fetchClasses();
-      } else {
-        setModalError(data.error || "Failed to create class.");
-      }
-    } catch (err) {
-      setModalError("Something went wrong on the server.");
-    }
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -84,15 +31,6 @@ export default function Dashboard({ user, setView, classes, fetchClasses }) {
         <div className="md:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-bold text-stone-800">Your Classes</h3>
-            {user.role === 'teacher' ? (
-              <button onClick={() => { setShowCreateModal(true); setModalError(null); }} className="btn-primary flex items-center gap-2 px-4 py-2 text-xs">
-                <Plus size={16} /> Create Class
-              </button>
-            ) : (
-              <button onClick={() => { setShowJoinModal(true); setModalError(null); }} className="btn-secondary flex items-center gap-2 px-4 py-2 text-xs">
-                <Plus size={16} /> Join Class
-              </button>
-            )}
           </div>
 
           {classes.length === 0 ? (
@@ -178,71 +116,6 @@ export default function Dashboard({ user, setView, classes, fetchClasses }) {
           </div>
         </div>
       </div>
-
-      {/* Join Modal */}
-      {showJoinModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 grid place-items-center p-4">
-          <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="card w-full max-w-sm p-8">
-            <h3 className="text-2xl font-semibold mb-2">Join a class</h3>
-            <p className="text-[#9e9e9e] mb-6">Enter the class code provided by your teacher.</p>
-            <form onSubmit={handleJoin} className="space-y-4">
-              <div>
-                <label className="label">Invite Code</label>
-                <input
-                  required
-                  type="text"
-                  className="input w-full uppercase"
-                  placeholder="X7Y2Z3"
-                  value={inviteCode}
-                  onChange={e => setInviteCode(e.target.value)}
-                />
-              </div>
-              {modalError && <p className="text-rose-500 text-xs font-bold">{modalError}</p>}
-              <div className="flex gap-2">
-                <button type="button" onClick={() => setShowJoinModal(false)} className="btn-secondary flex-1">Cancel</button>
-                <button type="submit" className="btn-primary flex-1">Join</button>
-              </div>
-            </form>
-          </motion.div>
-        </div>
-      )}
-
-      {/* Create Modal */}
-      {showCreateModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 grid place-items-center p-4">
-          <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="card w-full max-w-md p-8">
-            <h3 className="text-2xl font-semibold mb-2">Create new class</h3>
-            <p className="text-[#9e9e9e] mb-6">Set up a space for your students to learn.</p>
-            <form onSubmit={handleCreate} className="space-y-4">
-              <div>
-                <label className="label">Class Name</label>
-                <input
-                  required
-                  type="text"
-                  className="input w-full"
-                  placeholder="Advanced Mathematics"
-                  value={newClass.name}
-                  onChange={e => setNewClass({ ...newClass, name: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="label">Description (Optional)</label>
-                <textarea
-                  className="input w-full h-32 resize-none"
-                  placeholder="Topics, goals, and syllabus overview..."
-                  value={newClass.description}
-                  onChange={e => setNewClass({ ...newClass, description: e.target.value })}
-                />
-              </div>
-              {modalError && <p className="text-rose-500 text-xs font-bold">{modalError}</p>}
-              <div className="flex gap-2">
-                <button type="button" onClick={() => setShowCreateModal(false)} className="btn-secondary flex-1">Cancel</button>
-                <button type="submit" className="btn-primary flex-1">Create</button>
-              </div>
-            </form>
-          </motion.div>
-        </div>
-      )}
     </motion.div>
   );
 }

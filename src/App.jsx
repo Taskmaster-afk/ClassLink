@@ -8,6 +8,7 @@ import ClassroomView from './components/ClassroomView.jsx';
 import AssignmentView from './components/AssignmentView.jsx';
 import CalendarView from './components/CalendarView.jsx';
 import Sidebar from './components/Sidebar.jsx';
+import TopNav from './components/TopNav.jsx';
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -65,35 +66,39 @@ export default function App() {
   if (!user) return <AuthPage onLogin={setUser} />;
 
   return (
-    <div className="flex min-h-screen bg-[#f8f7f2] text-stone-800">
-      {/* Sidebar Navigation */}
-      <Sidebar 
-        user={user} 
-        view={view} 
-        setView={setView} 
-        classes={classes} 
-        logout={logout} 
-      />
+    <div className="flex flex-col min-h-screen bg-[#f8f7f2] text-stone-800">
+      <TopNav user={user} fetchClasses={fetchClasses} setView={setView} />
+      
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar Navigation */}
+        <Sidebar 
+          user={user} 
+          view={view} 
+          setView={setView} 
+          classes={classes} 
+          logout={logout} 
+        />
 
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto max-h-screen">
-        <div className="max-w-4xl mx-auto p-4 md:p-8">
-          <AnimatePresence mode="wait">
-            {view.type === 'dashboard' && (
-              <Dashboard key="dash" user={user} setView={setView} classes={classes} fetchClasses={fetchClasses} />
-            )}
-            {view.type === 'class' && view.id && (
-              <ClassroomView key="class" user={user} classId={view.id} setView={setView} />
-            )}
-            {view.type === 'assignment' && view.id && (
-              <AssignmentView key="assignment" user={user} assignmentId={view.id} setView={setView} />
-            )}
-            {view.type === 'calendar' && (
-              <CalendarView key="calendar" user={user} setView={setView} />
-            )}
-          </AnimatePresence>
-        </div>
-      </main>
+        {/* Main Content Area */}
+        <main className="flex-1 overflow-y-auto max-h-full">
+          <div className="max-w-4xl mx-auto p-4 md:p-8">
+            <AnimatePresence mode="wait">
+              {view.type === 'dashboard' && (
+                <Dashboard key="dash" user={user} setView={setView} classes={classes} fetchClasses={fetchClasses} />
+              )}
+              {view.type === 'class' && view.id && (
+                <ClassroomView key="class" user={user} classId={view.id} setView={setView} />
+              )}
+              {view.type === 'assignment' && view.id && (
+                <AssignmentView key="assignment" user={user} assignmentId={view.id} setView={setView} />
+              )}
+              {view.type === 'calendar' && (
+                <CalendarView key="calendar" user={user} setView={setView} />
+              )}
+            </AnimatePresence>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

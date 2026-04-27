@@ -2,18 +2,7 @@ import { Book, LogOut, Calendar as CalendarIcon, LayoutDashboard } from 'lucide-
 
 export default function Sidebar({ user, view, setView, classes, logout }) {
   return (
-    <div className="w-80 bg-white border-r border-stone-200 flex flex-col min-h-screen sticky top-0 flex-shrink-0">
-      <div className="p-6 border-b border-stone-100">
-        <div 
-          className="flex items-center gap-3 cursor-pointer group" 
-          onClick={() => setView({ type: 'dashboard' })}
-        >
-          <div className="w-10 h-10 bg-emerald-700 rounded-xl flex items-center justify-center text-white shadow-sm group-hover:bg-emerald-800 transition-colors">
-            <Book size={20} />
-          </div>
-          <span className="font-bold text-xl tracking-tight text-emerald-900">ClassLink</span>
-        </div>
-      </div>
+    <div className="w-80 bg-white border-r border-stone-200 flex flex-col min-h-screen sticky top-0 flex-shrink-0 pt-4">
 
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         <div className="space-y-1">
