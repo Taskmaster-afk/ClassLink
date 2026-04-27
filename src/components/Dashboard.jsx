@@ -124,20 +124,20 @@ export default function Dashboard({ user, setView }) {
                   key={c.id}
                   whileHover={{ y: -4 }}
                   onClick={() => setView({ type: 'class', id: c.id })}
-                  className="card p-6 min-h-[170px] flex flex-col cursor-pointer hover:border-emerald-700/30 group bg-white shadow-sm"
+                  className="card p-8 min-h-[220px] flex flex-col cursor-pointer hover:border-emerald-700/30 group bg-white shadow-sm"
                 >
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="w-10 h-10 bg-stone-100 group-hover:bg-emerald-700 group-hover:text-white rounded-xl flex items-center justify-center transition-colors">
-                      <Book size={20} />
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="w-14 h-14 bg-stone-100 group-hover:bg-emerald-700 group-hover:text-white rounded-2xl flex items-center justify-center transition-colors">
+                      <Book size={28} />
                     </div>
                   </div>
-                  <h3 className="text-xl font-bold text-stone-800 mb-2 group-hover:text-emerald-900 leading-tight">{c.name}</h3>
-                  <p className="text-stone-500 text-sm line-clamp-2 mb-4 flex-grow">{c.description}</p>
-                  <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-stone-400">
+                  <h3 className="text-2xl font-bold text-stone-800 mb-2 group-hover:text-emerald-900 leading-tight">{c.name}</h3>
+                  <p className="text-stone-500 text-base line-clamp-2 mb-6 flex-grow">{c.description}</p>
+                  <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-stone-400">
                     <span className="flex items-center gap-1.5 truncate pr-2">
                       {user.role === 'student' ? (c.teacher_name || 'Instructor') : 'You'}
                     </span>
-                    <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                    <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform flex-shrink-0" />
                   </div>
                 </motion.div>
               ))}
