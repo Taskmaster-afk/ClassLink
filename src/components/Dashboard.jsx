@@ -3,8 +3,7 @@ import { Book, GraduationCap, Plus, ChevronRight, ClipboardCheck } from 'lucide-
 import { motion } from 'motion/react';
 import { BASE_URL } from '../lib/utils.js';
 
-export default function Dashboard({ user, setView }) {
-  const [classes, setClasses] = useState([]);
+export default function Dashboard({ user, setView, classes, fetchClasses }) {
   const [todoList, setTodoList] = useState([]);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -12,15 +11,7 @@ export default function Dashboard({ user, setView }) {
   const [newClass, setNewClass] = useState({ name: '', description: '' });
   const [modalError, setModalError] = useState(null);
 
-  const fetchClasses = () => {
-    fetch(`${BASE_URL}/api/classes`, { credentials: 'include' })
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) setClasses(data);
-        else console.error('Failed to fetch classes:', data);
-      })
-      .catch(err => console.error('Error fetching classes:', err));
-  };
+
 
   const fetchTodo = () => {
     if (user.role === 'student') {
@@ -34,7 +25,6 @@ export default function Dashboard({ user, setView }) {
   };
 
   useEffect(() => {
-    fetchClasses();
     fetchTodo();
   }, []);
 

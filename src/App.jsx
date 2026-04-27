@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Book, LogOut, Calendar as CalendarIcon } from 'lucide-react';
 import { AnimatePresence } from 'motion/react';
 import { BASE_URL } from './lib/utils.js';
 
@@ -8,11 +7,23 @@ import Dashboard from './components/Dashboard.jsx';
 import ClassroomView from './components/ClassroomView.jsx';
 import AssignmentView from './components/AssignmentView.jsx';
 import CalendarView from './components/CalendarView.jsx';
+import Sidebar from './components/Sidebar.jsx';
 
 export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState({ type: 'dashboard' });
+  const [classes, setClasses] = useState([]);
+
+  const fetchClasses = () => {
+    fetch(`${BASE_URL}/api/classes`, { credentials: 'include' })
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setClasses(data);
+        else console.error('Failed to fetch classes:', data);
+      })
+      .catch(err => console.error('Error fetching classes:', err));
+  };
 
   useEffect(() => {
     fetch(`${BASE_URL}/api/auth/me`, {
@@ -22,6 +33,7 @@ export default function App() {
       .then(data => {
         if (data && !data.error) {
           setUser(data);
+          fetchClasses(); // Fetch classes once user is authenticated
         } else {
           setUser(null);
         }
@@ -53,70 +65,34 @@ export default function App() {
   if (!user) return <AuthPage onLogin={setUser} />;
 
   return (
-    <div className="min-h-screen bg-[#f8f7f2] pb-20 text-stone-800">
-      {/* Navigation */}
-      <nav className="bg-white border-b border-stone-200 px-4 md:px-8 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
-        <div className="flex items-center gap-8">
-          <div 
-            className="flex items-center gap-2 cursor-pointer" 
-            onClick={() => setView({ type: 'dashboard' })}
-          >
-            <div className="w-8 h-8 bg-emerald-700 rounded-lg flex items-center justify-center text-white">
-              <Book size={18} />
-            </div>
-            <span className="font-bold text-lg tracking-tight text-emerald-900">ClassLink</span>
-          </div>
+    <div className="flex min-h-screen bg-[#f8f7f2] text-stone-800">
+      {/* Sidebar Navigation */}
+      <Sidebar 
+        user={user} 
+        view={view} 
+        setView={setView} 
+        classes={classes} 
+        logout={logout} 
+      />
 
-          {user.role === 'student' && (
-            <div className="hidden md:flex items-center gap-6 border-l border-stone-200 pl-8">
-              <button 
-                onClick={() => setView({ type: 'dashboard' })}
-                className={`text-xs uppercase font-bold tracking-widest transition-colors ${view.type === 'dashboard' ? 'text-emerald-700' : 'text-stone-400 hover:text-stone-800'}`}
-              >
-                Dashboard
-              </button>
-              <button 
-                onClick={() => setView({ type: 'calendar' })}
-                className={`text-xs uppercase font-bold tracking-widest transition-colors flex items-center gap-1.5 ${view.type === 'calendar' ? 'text-emerald-700' : 'text-stone-400 hover:text-stone-800'}`}
-              >
-                <CalendarIcon size={14} />
-                Calendar
-              </button>
-            </div>
-          )}
+      {/* Main Content Area */}
+      <main className="flex-1 overflow-y-auto max-h-screen">
+        <div className="max-w-4xl mx-auto p-4 md:p-8">
+          <AnimatePresence mode="wait">
+            {view.type === 'dashboard' && (
+              <Dashboard key="dash" user={user} setView={setView} classes={classes} fetchClasses={fetchClasses} />
+            )}
+            {view.type === 'class' && view.id && (
+              <ClassroomView key="class" user={user} classId={view.id} setView={setView} />
+            )}
+            {view.type === 'assignment' && view.id && (
+              <AssignmentView key="assignment" user={user} assignmentId={view.id} setView={setView} />
+            )}
+            {view.type === 'calendar' && (
+              <CalendarView key="calendar" user={user} setView={setView} />
+            )}
+          </AnimatePresence>
         </div>
-        
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex flex-col items-end">
-            <span className="text-sm font-semibold text-stone-800">{user.name}</span>
-            <span className="text-[10px] uppercase tracking-wider font-bold text-stone-400 leading-none">{user.role}</span>
-          </div>
-          <button 
-            onClick={logout}
-            className="p-2 hover:bg-stone-50 rounded-xl transition-colors text-stone-400 hover:text-stone-800"
-            title="Logout"
-          >
-            <LogOut size={20} />
-          </button>
-        </div>
-      </nav>
-
-      {/* Content */}
-      <main className="max-w-4xl mx-auto p-4 md:p-8">
-        <AnimatePresence mode="wait">
-          {view.type === 'dashboard' && (
-            <Dashboard key="dash" user={user} setView={setView} />
-          )}
-          {view.type === 'class' && view.id && (
-            <ClassroomView key="class" user={user} classId={view.id} setView={setView} />
-          )}
-          {view.type === 'assignment' && view.id && (
-            <AssignmentView key="assignment" user={user} assignmentId={view.id} setView={setView} />
-          )}
-          {view.type === 'calendar' && (
-            <CalendarView key="calendar" user={user} setView={setView} />
-          )}
-        </AnimatePresence>
       </main>
     </div>
   );

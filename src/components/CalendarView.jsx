@@ -102,8 +102,11 @@ export default function CalendarView({ user, setView }) {
               </div>
             ) : (
               <div className="space-y-4">
-                <p className="text-xs text-stone-500 leading-relaxed">
-                  The calendar view is currently only available for students to track their upcoming due dates.
+                <p className="text-xs text-stone-500 leading-relaxed italic">
+                  No assignments due on this date.
+                </p>
+                <p className="text-[10px] text-stone-400">
+                  (Note: Viewing assignments on the calendar as a teacher is coming soon!)
                 </p>
               </div>
             )}
