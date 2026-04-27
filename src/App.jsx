@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Book, LogOut } from 'lucide-react';
+import { Book, LogOut, Calendar as CalendarIcon } from 'lucide-react';
 import { AnimatePresence } from 'motion/react';
 import { BASE_URL } from './lib/utils.js';
 
@@ -7,6 +7,7 @@ import AuthPage from './components/AuthPage.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import ClassroomView from './components/ClassroomView.jsx';
 import AssignmentView from './components/AssignmentView.jsx';
+import CalendarView from './components/CalendarView.jsx';
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -55,14 +56,34 @@ export default function App() {
     <div className="min-h-screen bg-[#f8f7f2] pb-20 text-stone-800">
       {/* Navigation */}
       <nav className="bg-white border-b border-stone-200 px-4 md:px-8 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
-        <div 
-          className="flex items-center gap-2 cursor-pointer" 
-          onClick={() => setView({ type: 'dashboard' })}
-        >
-          <div className="w-8 h-8 bg-emerald-700 rounded-lg flex items-center justify-center text-white">
-            <Book size={18} />
+        <div className="flex items-center gap-8">
+          <div 
+            className="flex items-center gap-2 cursor-pointer" 
+            onClick={() => setView({ type: 'dashboard' })}
+          >
+            <div className="w-8 h-8 bg-emerald-700 rounded-lg flex items-center justify-center text-white">
+              <Book size={18} />
+            </div>
+            <span className="font-bold text-lg tracking-tight text-emerald-900">ClassLink</span>
           </div>
-          <span className="font-bold text-lg tracking-tight text-emerald-900">ClassLink</span>
+
+          {user.role === 'student' && (
+            <div className="hidden md:flex items-center gap-6 border-l border-stone-200 pl-8">
+              <button 
+                onClick={() => setView({ type: 'dashboard' })}
+                className={`text-xs uppercase font-bold tracking-widest transition-colors ${view.type === 'dashboard' ? 'text-emerald-700' : 'text-stone-400 hover:text-stone-800'}`}
+              >
+                Dashboard
+              </button>
+              <button 
+                onClick={() => setView({ type: 'calendar' })}
+                className={`text-xs uppercase font-bold tracking-widest transition-colors flex items-center gap-1.5 ${view.type === 'calendar' ? 'text-emerald-700' : 'text-stone-400 hover:text-stone-800'}`}
+              >
+                <CalendarIcon size={14} />
+                Calendar
+              </button>
+            </div>
+          )}
         </div>
         
         <div className="flex items-center gap-4">
@@ -91,6 +112,9 @@ export default function App() {
           )}
           {view.type === 'assignment' && view.id && (
             <AssignmentView key="assignment" user={user} assignmentId={view.id} setView={setView} />
+          )}
+          {view.type === 'calendar' && (
+            <CalendarView key="calendar" user={user} setView={setView} />
           )}
         </AnimatePresence>
       </main>
