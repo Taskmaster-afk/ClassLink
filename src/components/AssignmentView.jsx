@@ -59,6 +59,10 @@ function AssignmentView({ user, assignmentId, setView }) {
 
   if (!assignment) return null;
 
+  const isPastDeadline = assignment.due_date ? new Date() > new Date(assignment.due_date) : false;
+  const isGraded = assignment.mySubmission?.status === 'graded';
+  const isDisabled = isGraded || isPastDeadline;
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
        <button 
@@ -190,14 +194,14 @@ function AssignmentView({ user, assignmentId, setView }) {
               
               <form onSubmit={submitWork} className="space-y-4">
                 <textarea 
-                  disabled={assignment.mySubmission?.status === 'graded'}
+                  disabled={isDisabled}
                   className="input w-full h-48 resize-none text-sm bg-stone-50 border border-stone-100 focus:bg-white placeholder:text-stone-300" 
-                  placeholder="Paste your submission content here..."
+                  placeholder={isDisabled && !isGraded ? "The deadline for this assignment has passed." : "Paste your submission content here..."}
                   value={submissionContent}
                   onChange={e => setSubmissionContent(e.target.value)}
                 />
                 
-                {assignment.mySubmission?.status !== 'graded' && (
+                {!isDisabled && (
                   <div>
                     <label className="flex items-center gap-2 p-3 bg-stone-50 border border-stone-100 rounded-xl cursor-pointer hover:bg-stone-100 transition-colors text-stone-500 hover:text-stone-800">
                       <FileUp size={18} />
@@ -215,11 +219,11 @@ function AssignmentView({ user, assignmentId, setView }) {
                 )}
 
                 <button 
-                  disabled={assignment.mySubmission?.status === 'graded'}
+                  disabled={isDisabled}
                   type="submit" 
-                  className="btn-primary w-full py-3 uppercase tracking-widest text-xs font-bold"
+                  className={`w-full py-3 uppercase tracking-widest text-xs font-bold rounded-full transition-colors shadow-sm ${isDisabled && !isGraded ? 'bg-stone-200 text-stone-400 cursor-not-allowed' : 'btn-primary'}`}
                 >
-                  {assignment.mySubmission ? 'Update Work' : 'Turn In'}
+                  {isPastDeadline ? 'Deadline Passed' : (assignment.mySubmission ? 'Update Work' : 'Turn In')}
                 </button>
               </form>
             </div>
