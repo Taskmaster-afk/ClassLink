@@ -124,15 +124,15 @@ export default function Dashboard({ user, setView }) {
                   key={c.id}
                   whileHover={{ y: -4 }}
                   onClick={() => setView({ type: 'class', id: c.id })}
-                  className="card p-5 cursor-pointer hover:border-emerald-700/30 group bg-white shadow-sm"
+                  className="card p-6 min-h-[170px] flex flex-col cursor-pointer hover:border-emerald-700/30 group bg-white shadow-sm"
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div className="w-10 h-10 bg-stone-100 group-hover:bg-emerald-700 group-hover:text-white rounded-xl flex items-center justify-center transition-colors">
                       <Book size={20} />
                     </div>
                   </div>
-                  <h3 className="text-lg font-bold text-stone-800 mb-1 group-hover:text-emerald-900 leading-tight">{c.name}</h3>
-                  <p className="text-stone-500 text-xs line-clamp-1 mb-4">{c.description}</p>
+                  <h3 className="text-xl font-bold text-stone-800 mb-2 group-hover:text-emerald-900 leading-tight">{c.name}</h3>
+                  <p className="text-stone-500 text-sm line-clamp-2 mb-4 flex-grow">{c.description}</p>
                   <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-stone-400">
                     <span className="flex items-center gap-1.5 truncate pr-2">
                       {user.role === 'student' ? (c.teacher_name || 'Instructor') : 'You'}
@@ -146,7 +146,7 @@ export default function Dashboard({ user, setView }) {
         </div>
 
         <div className="md:col-span-1">
-          <div className="card p-6 bg-white shadow-sm sticky top-24">
+          <div className="card p-8 bg-white shadow-sm sticky top-24 min-h-[400px]">
             <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-stone-400 mb-6 flex items-center gap-2">
               <ClipboardCheck size={18} className="text-emerald-700" />
               {user.role === 'student' ? 'Your To-Do List' : 'Class Overview'}
@@ -161,9 +161,9 @@ export default function Dashboard({ user, setView }) {
                     <div
                       key={a.id}
                       onClick={() => setView({ type: 'assignment', id: a.id })}
-                      className="group cursor-pointer border-b border-stone-50 pb-3 last:border-0 hover:bg-stone-50 transition-colors p-2 rounded-lg -mx-2"
+                      className="group cursor-pointer border-b border-stone-50 pb-4 mb-2 last:border-0 hover:bg-stone-50 transition-colors p-3 rounded-xl -mx-3"
                     >
-                      <p className="text-sm font-bold text-stone-800 group-hover:text-emerald-700 line-clamp-1">{a.title}</p>
+                      <p className="text-base font-bold text-stone-800 group-hover:text-emerald-700 line-clamp-1 mb-1">{a.title}</p>
                       <div className="flex items-center justify-between mt-1">
                         <span className="text-[10px] text-stone-400 font-medium truncate max-w-[120px]">{a.class_name}</span>
                         <span className="text-[10px] font-bold text-emerald-700 whitespace-nowrap">
@@ -176,9 +176,9 @@ export default function Dashboard({ user, setView }) {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
-                  <p className="text-[10px] uppercase font-bold text-emerald-700 mb-1">Total Classes</p>
-                  <p className="text-3xl font-bold text-emerald-900">{classes.length}</p>
+                <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-100">
+                  <p className="text-xs uppercase font-bold text-emerald-700 mb-2">Total Classes</p>
+                  <p className="text-5xl font-bold text-emerald-900">{classes.length}</p>
                 </div>
                 <p className="text-xs text-stone-500 leading-relaxed">
                   Creating a new class will generate an invite code for your students automatically.
