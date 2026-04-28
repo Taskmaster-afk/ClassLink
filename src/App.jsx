@@ -34,7 +34,9 @@ export default function App() {
       .then(data => {
         if (data && !data.error) {
           setUser(data);
-          fetchClasses(); // Fetch classes once user is authenticated
+          // fetchClasses will be called by the new useEffect or we can just leave it here
+          // Wait, if we leave it here, it will fetch on initial load. That's fine.
+          fetchClasses(); // Fetch classes once user is authenticated on initial load
         } else {
           setUser(null);
         }
@@ -64,7 +66,12 @@ export default function App() {
     </div>
   );
 
-  if (!user) return <AuthPage onLogin={setUser} />;
+  const handleLogin = (userData) => {
+    setUser(userData);
+    fetchClasses();
+  };
+
+  if (!user) return <AuthPage onLogin={handleLogin} />;
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f8f7f2] text-stone-800">
