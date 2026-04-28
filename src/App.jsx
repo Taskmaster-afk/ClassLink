@@ -51,6 +51,7 @@ export default function App() {
   const logout = async () => {
     await fetch(`${BASE_URL}/api/auth/logout`, { method: 'POST', credentials: 'include' });
     setUser(null);
+    setClasses([]);
     setView({ type: 'dashboard' });
   };
 
