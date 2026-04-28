@@ -1,14 +1,9 @@
-This contains everything you need to run your app locally.
+WEBD Final Group Project by -
 
-View your app in AI Studio: https://ai.studio/apps/4e5322ff-49dd-492c-95db-f546e25c40f9
+Group Members:
+1. Kushagra Raghuvanshi(IIT2025036)
+2. Rohit Malik (IIT2025033)
+3. Abeer Malviya(IIT2025047)
+4. Aditya Rana(IIT2025038)
 
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+ClassLink - A one stop destination for students and teachers to interact, share resources and collaborate.
